@@ -11,8 +11,8 @@ _logger = logging.getLogger(__name__)
 
 try:
     import conekta
-except:
-    _logger.debug('Cannot `import conekta`.')
+except (ImportError, IOError) as err:
+    _logger.debug(err)
 
 
 class ConektaRefundWizard(models.TransientModel):
