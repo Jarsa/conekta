@@ -1,0 +1,54 @@
+language: python
+sudo: false
+cache:
+  apt: true
+  directories:
+    - $HOME/.cache/pip
+
+python:
+  - "2.7"
+
+addons:
+  apt:
+    sources:
+      - pov-wkhtmltopdf
+    packages:
+      - expect-dev
+      - python-lxml
+      - python-simplejson
+      - python-serial
+      - python-yaml
+      - wkhtmltopdf
+
+before_install:
+ - "export DISPLAY=:99.0"
+ - "sh -e /etc/init.d/xvfb start"
+
+env:
+  global:
+  - VERSION="9.0" TESTS="0" LINT_CHECK="0" TRANSIFEX="0"
+  - TRANSIFEX_USER='info@jarsa.com.mx'
+  - secure: "bHN0bskiTOGdBDACtvpAyUyBYSWUGUgy0RXdm7JmxdbjVAuY9L+ZapV4VP7J/p85xyosvQ5BoSrQ7levtd5OGVroPS3To12GerbDPCJEenqZB9CGmCGxhtRmSx+kxXAsvqHrVjq6AaDw8M3utzBcLFrvhDDD+oos7IbRpxfx3/bnjFOe5fjwSOdjzKZpCulBefZlj8Cztq6MMGIMzmjjl+7xxZ5OxOq1Un5L2+/Rzuf9IcHUGSHXC4LdRliNb8veKqGTXgSe8KnqnhEH1DQ8IlC1quSN5LZ/QJu8l+t/pw9dICTkDc2k+MyGLlTPelKVnjU4xRYXeic5hNgIhEzxSDrsNIL/SfEZBwfgd0wqDtKHyV749a/JEr9VD3AM6zeJwhCmOh96yfz2sLaU8iBorgzDLlC5j1fNTDg7ydMZ97p5NykC+M8gU1zsOp58sJQZxataVDpDfa6Z2yBx6eAVptEY5mr35G2nW8gjZHz7n8BYWLYUGr9OlQpwY6ksnSwZeYQKoQd/Iq2Ct8Br9N/YeAFe5M7udNkYDECnKnxC7WgROErDYFVnoKTyiOS8yYj7Tl3P6Ic1Adwcsu6l3+3jARgjXgQEFCIVIklRTIZGUyK7lkwzHEdzeMIC1h7LVXYwLZpCfqNRnjN4cWtLxmp+tx72NX+gvIttuO6YG8HfrZM="
+  - TRANSIFEX_PROJECT_SLUG='Jarsa-conekta-9-0'
+  - TRANSIFEX_ORGANIZATION='jarsa'
+  - TRANSIFEX_TEAM='62171'
+
+  matrix:
+  - LINT_CHECK="1"
+  - TRANSIFEX="1"
+  - TESTS="1" ODOO_REPO="odoo/odoo"
+
+virtualenv:
+  system_site_packages: true
+
+install:
+  - git clone --depth=1 https://github.com/Vauxoo/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
+  - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
+  - if [[ "${OCA_RUNBOT}" == "1" ]]; then git clone --depth=1 git@github.com:odoo/enterprise.git -b $VERSION ${HOME}/enterprise; fi
+  - travis_install_nightly
+
+script:
+  - travis_run_tests
+
+after_success:
+  - travis_after_tests_success
